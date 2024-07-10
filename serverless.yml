@@ -1,0 +1,95 @@
+service: softtek-demo-expressjs
+provider:
+  name: aws
+  runtime: nodejs18.x
+  versionFunctions: false
+  stage: dev
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["PlanetTable", "Arn" ] }
+  environment:
+    ENVIRONMENT: ${self:provider.stage}
+    SECRET_TOKEN: migcollogintkn
+    PLANET_TABLE: ${self:custom.tableName}
+
+configValidationMode: error
+
+custom:
+  tableName: 'planet-${self:provider.stage}'
+
+functions:
+  app:
+    handler: handler.handler
+    events:
+      - http:
+          path: /
+          method: any
+      - http:
+          path: /{proxy+}
+          method: any
+  getFilms:
+    handler: src/controllers/SwapiController.getFilms
+    name: getFilms-${self:provider.stage}
+    memorySize: 128 # mb
+    timeout: 30 # seconds
+    events:
+      - http:
+          path: /films
+          method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+  getPeople:
+    handler: src/controllers/SwapiController.getPeople
+    name: getPeople-${self:provider.stage}
+    events:
+      - http:
+          #path: /people/{peopleId}
+          path: /people
+          method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+
+resources:
+  Resources:
+    PlanetTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: PlanetTable
+        AttributeDefinitions:
+          - AttributeName: nombre
+            AttributeType: S
+        KeySchema:
+          - AttributeName: nombre
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+plugins:
+  - serverless-offline
+  - serverless-middleware
