@@ -1,0 +1,136 @@
+service: softtek-demo-expressjs
+provider:
+  name: aws
+  runtime: nodejs20.x
+  versionFunctions: false
+  stage: demo
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:us-east-1:*:table/${self:custom.tableName}"
+  environment:
+    ENVIRONMENT: ${self:provider.stage}
+    SECRET_TOKEN: migcollogintkn
+
+configValidationMode: error
+
+custom:
+  tableName: 'planet-${self:provider.stage}'
+  dynamodb:
+    stages:
+      - demo
+  autoswagger:
+        host: 'h1madjqatp5.execute-api.us-east-1.amazonaws.com/demo'
+
+functions:
+  app:
+    handler: handler.handler
+    events:
+      - http:
+          path: /
+          method: any
+      - http:
+          path: /{proxy+}
+          method: any
+  getFilms:
+    handler: src/controllers/SwapiController.getFilms
+    name: getFilms-${self:provider.stage}
+    memorySize: 128 # mb
+    timeout: 30 # seconds
+    events:
+      - http:
+          path: /films
+          method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+  getPeople:
+    handler: src/controllers/SwapiController.getPeople
+    name: getPeople-${self:provider.stage}
+    events:
+      - http:
+          #path: /people/{peopleId}
+          path: /people
+          method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+  getPlanets:
+    handler: src/controllers/PlanetController.getAll
+    name: getPlanets-${self:provider.stage}
+    events:
+      - http:
+          path: /planets
+          method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+  createPlanet:
+    handler: src/controllers/PlanetController.createPlanet
+    name: createPlanet-${self:provider.stage}
+    events:
+      - http:
+          path: /planet
+          method: post
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+resources:
+  Resources:
+    PlanetTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: PlanetTable
+        AttributeDefinitions:
+          - AttributeName: nombre
+            AttributeType: S
+        KeySchema:
+          - AttributeName: nombre
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+plugins:
+  - serverless-offline
+  - serverless-middleware
+  - serverless-dotenv-plugin
+  - serverless-auto-swagger
+  #- serverless-dynamodb-local

@@ -1,0 +1,22 @@
+openapi: "3.0.0"
+info:
+  title: "Softtek NodeJS Demo API"
+  version: "1.0.0"
+paths:
+  /films:
+    get:
+      summary: "Obtiene una lista de películas de Swapi"
+      responses:
+        '200':
+          description: "Lista de películas"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                    nombre:
+                      type: "string"
