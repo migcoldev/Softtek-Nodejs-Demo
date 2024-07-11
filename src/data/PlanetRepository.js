@@ -4,7 +4,7 @@ const { _headers_cors } = require('../helper/utils')
 
 class PlanetRepository {
     constructor() {
-        this.tableName = 'planeta';
+        this.tableName = PlanetTable;
     }
 
     async getAll() {
@@ -19,7 +19,7 @@ class PlanetRepository {
         const params = {
             TableName: this.tableName,
             Item: {
-                UserID: uuidv4(),
+                PlanetId: uuidv4(),
                 Username: data.Username,
             },
         };

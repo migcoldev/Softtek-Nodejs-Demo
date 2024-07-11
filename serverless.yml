@@ -5,18 +5,20 @@ provider:
   versionFunctions: false
   stage: dev
   region: us-east-1
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource:
-        - { "Fn::GetAtt": ["PlanetTable", "Arn" ] }
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - { "Fn::GetAtt": ["PlanetTable", "Arn" ] }
   environment:
     ENVIRONMENT: ${self:provider.stage}
     SECRET_TOKEN: migcollogintkn
@@ -26,6 +28,9 @@ configValidationMode: error
 
 custom:
   tableName: 'planet-${self:provider.stage}'
+  dynamodb:
+    stages:
+      - dev
 
 functions:
   app:
@@ -74,7 +79,23 @@ functions:
               - X-Amz-Security-Token
               - X-Amz-User-Agent
             allowCredentials: false
-
+  createPlanet:
+    handler: src/controllers/PlanetController.create
+    name: createPlanet-${self:provider.stage}
+    events:
+      - http:
+          path: /planet
+          method: post
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
 resources:
   Resources:
     PlanetTable:
@@ -93,3 +114,4 @@ resources:
 plugins:
   - serverless-offline
   - serverless-middleware
+  - serverless-dynamodb-local

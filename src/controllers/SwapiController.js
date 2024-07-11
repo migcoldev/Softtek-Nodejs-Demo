@@ -14,7 +14,6 @@ class SwapiController {
             status: true
         })
         return response;
-        //res.json(data)
     }
 
     async getPeople(req, res) {
@@ -27,7 +26,6 @@ class SwapiController {
             status: true
         })
         return response;
-        //res.json(data)
     }
 
 }
