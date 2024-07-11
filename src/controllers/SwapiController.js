@@ -1,5 +1,5 @@
 const SwapiService = require(`../services/SwapiService`);
-const { _headers_cors } = require('../helper/utils')
+const { _headers_cors } = require('../helpers/utils')
 
 class SwapiController {
 

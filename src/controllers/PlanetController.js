@@ -1,5 +1,5 @@
 const PlanetService = require(`../services/PlanetService`);
-const { _headers_cors } = require('../helper/utils')
+const { _headers_cors } = require('../helpers/utils')
 
 class PlanetController {
 
@@ -8,14 +8,19 @@ class PlanetController {
 
         const data = await PlanetService.getAll()
 
-        return data;
+        response.body = JSON.stringify({
+            data: data,
+            status: true
+        })
+        return response;
     }
 
-    async create(req, res) {
+    async createPlanet(req, res) {
         const response = { statusCode: 200, headers: _headers_cors };
-
-        const data = await PlanetService.create()
-
+        
+        const jsonData = JSON.parse(req.body);
+        const data = await PlanetService.createPlanet(jsonData)
+        
         response.body = JSON.stringify({
             data: data,
             status: true

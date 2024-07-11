@@ -1,7 +1,6 @@
-const db = require(`../../helpers/db`);
+const db = require(`../helpers/db`);
+const { ScanCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
 const PlanetTable = process.env.PLANET_TABLE;
-const { _headers_cors } = require('../helper/utils')
-import { v4 as uuidv4 } from 'uuid';
 
 class PlanetRepository {
     constructor() {
@@ -14,16 +13,16 @@ class PlanetRepository {
         };
 
         try {
-            const { Items } = await client.send(new ScanCommand(params));
+            const { Items } = await db.send(new ScanCommand(params));
             return Items;
         } catch (error) {
-            console.error("Error al obtener items de DynamoDB:", error);
+            console.error("Error al obtener planets de DynamoDB:", error);
             throw error;
         }
-        //return await db.scan(params).promise();
     }
 
-    async create(data) {
+    async createPlanet(data) {
+        const { v4: uuidv4 } = require('uuid');
         const params = {
             TableName: this.tableName,
             Item: {
@@ -39,15 +38,12 @@ class PlanetRepository {
         };
 
         try {
-            await this.client.send(new PutCommand(params));
-            return item;
+            await db.send(new PutCommand(params));
+            return params.Item;
         } catch (error) {
             console.error("Error DB : ", error);
             throw error;
         }
-        //await db.put(params).promise();
-
-        return params.Item;
     }
 }
 

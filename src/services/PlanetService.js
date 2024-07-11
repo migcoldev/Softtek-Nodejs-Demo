@@ -8,10 +8,9 @@ class PlanetService {
         return data;
     }
 
-    async create(data) {
-        return await PlanetRepository.create({
-            Username: data.Username
-        });
+    async createPlanet(data) {
+        return await PlanetRepository.createPlanet(data);
+        
     }
 
 }

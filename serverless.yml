@@ -1,9 +1,9 @@
 service: softtek-demo-expressjs
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   versionFunctions: false
-  stage: dev
+  stage: demo
   region: us-east-1
   iam:
     role:
@@ -17,20 +17,25 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
-          Resource:
-            - { "Fn::GetAtt": ["PlanetTable", "Arn" ] }
+          Resource: "arn:aws:dynamodb:us-east-1:*:table/${self:custom.tableName}"
   environment:
     ENVIRONMENT: ${self:provider.stage}
     SECRET_TOKEN: migcollogintkn
-    PLANET_TABLE: ${self:custom.tableName}
+    ACCESS_KEY_ID: ${env:ACCESS_KEY_ID}
+    SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
+    REGION: ${env:REGION}
+    ENDPOINT: ${env:ENDPOINT}
+    PLANET_TABLE: ${env:PLANET_TABLE}
 
 configValidationMode: error
 
 custom:
+  dotenv:
+    path: .env
   tableName: 'planet-${self:provider.stage}'
   dynamodb:
     stages:
-      - dev
+      - demo
 
 functions:
   app:
@@ -79,8 +84,25 @@ functions:
               - X-Amz-Security-Token
               - X-Amz-User-Agent
             allowCredentials: false
+  getPlanets:
+    handler: src/controllers/PlanetController.getAll
+    name: getPlanets-${self:provider.stage}
+    events:
+      - http:
+          path: /planets
+          method: get
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
   createPlanet:
-    handler: src/controllers/PlanetController.create
+    handler: src/controllers/PlanetController.createPlanet
     name: createPlanet-${self:provider.stage}
     events:
       - http:
@@ -114,4 +136,5 @@ resources:
 plugins:
   - serverless-offline
   - serverless-middleware
-  - serverless-dynamodb-local
+  - serverless-dotenv-plugin
+  #- serverless-dynamodb-local
