@@ -29,6 +29,8 @@ custom:
   dynamodb:
     stages:
       - demo
+  autoswagger:
+        host: 'h1madjqatp5.execute-api.us-east-1.amazonaws.com/demo'
 
 functions:
   app:
@@ -130,4 +132,5 @@ plugins:
   - serverless-offline
   - serverless-middleware
   - serverless-dotenv-plugin
+  - serverless-auto-swagger
   #- serverless-dynamodb-local

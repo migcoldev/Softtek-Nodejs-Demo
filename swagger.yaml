@@ -8,7 +8,7 @@ paths:
       summary: "Obtiene una lista de películas de Swapi"
       responses:
         '200':
-          description: "Una lista de usuarios"
+          description: "Lista de películas"
           content:
             application/json:
               schema:

@@ -36,3 +36,7 @@ Ejemplo : AWS_ENDPOINT = https://1madjqatp5.execute-api.us-east-1.amazonaws.com/
 - GET AWS_ENDPOINT/people
 - GET AWS_ENDPOINT/planets
 - POST AWS_ENDPOINT/planet
+
+## Swagger
+
+https://kru0ruqac5.execute-api.us-east-1.amazonaws.com/swagger
