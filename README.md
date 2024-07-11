@@ -1,6 +1,7 @@
 # Proyecto Serverless en Node.js
 
 Este proyecto demuestra la implementación de una aplicación serverless utilizando Node.js. Se enfoca en crear funciones que se pueden desplegar en un proveedor de servicios cloud como AWS.
+Se ha utilizado Serverless V4 para el Cloudformation, considerarlo al momento de ejecutar el deploy ya que solicitará login.
 
 ## Requisitos Previos
 

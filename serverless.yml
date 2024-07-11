@@ -21,17 +21,10 @@ provider:
   environment:
     ENVIRONMENT: ${self:provider.stage}
     SECRET_TOKEN: migcollogintkn
-    ACCESS_KEY_ID: ${env:ACCESS_KEY_ID}
-    SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
-    REGION: ${env:REGION}
-    ENDPOINT: ${env:ENDPOINT}
-    PLANET_TABLE: ${env:PLANET_TABLE}
 
 configValidationMode: error
 
 custom:
-  dotenv:
-    path: .env
   tableName: 'planet-${self:provider.stage}'
   dynamodb:
     stages:
